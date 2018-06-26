@@ -1,0 +1,20 @@
+# From https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/container_engine/django_tutorial/.dockerignore
+.dockerignore
+Dockerfile
+db.sqlite3
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*,cover
+*.log
+.git

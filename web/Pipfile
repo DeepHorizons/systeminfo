@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+aiohttp = "*"
+"ed0a5ba" = {path = "./..", editable = true}
+"aiohttp-jinja2" = "*"
+
+[dev-packages]
+aiohttp-devtools = "*"
+locust = {git = "https://github.com/locustio/locust.git", editable = true}
+
+[requires]
+python_version = "3.6"
