@@ -2,6 +2,7 @@ import asyncio
 import time
 import os
 import sys
+import os
 import systeminfo
 
 async def generate_images(app):
@@ -11,7 +12,10 @@ async def generate_images(app):
     
     This function should be changed to fit your needs
     """
-    data = local_test()
+    if 'SINGULARITY_IMAGE_DIR' in os.environ:
+        data = singularity_images(os.environ['SINGULARITY_IMAGE_DIR'])
+    else:
+        data = local_test()
     app.logger.debug("getting data for {len} images".format(len=len(data)))
     
     # Async worked much better here, 10 images took about 120 seconds using sync, 50 seconds using async
@@ -24,9 +28,9 @@ async def generate_images(app):
 def local_test(num=1):
     return {image_name: systeminfo.System() for image_name in ('localhost' + str(i) for i in range(num))}
 
-def singularity_images():
+def singularity_images(path):
     # Find all images, symlink and all
-    images = [os.path.join(path, file) for path, folers, files in os.walk('/opt/singularity/images') for file in files]
+    images = [os.path.join(path, file) for path, folers, files in os.walk(path) for file in files]
     images.sort(key=lambda key: len(key))
     # TODO Get hashes of each
     # TODO Compare against previous under app['singularity_images']
