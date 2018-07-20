@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 aiohttp = "*"
 "ed0a5ba" = {path = "./..", editable = true}
-"aiohttp-jinja2" = "*"
+aiohttp-jinja2 = "*"
 
 [dev-packages]
 aiohttp-devtools = "*"
