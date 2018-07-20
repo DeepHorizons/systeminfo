@@ -33,7 +33,7 @@ class Information:
             else:
                 cmd = self.pre_command + command
         else:
-            if type(self.pre_command is list):
+            if type(self.pre_command) is list:
                 cmd = ' '.join(self.pre_command) + command
             else:
                 cmd = self.pre_command + command
