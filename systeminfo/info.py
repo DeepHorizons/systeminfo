@@ -20,6 +20,7 @@ class Information:
         """
         self.pre_command = pre_command
         self.timeout = timeout
+        self.stderr_into_stdout = True
 
     @property
     def log(self):
@@ -42,27 +43,34 @@ class Information:
     def run_command(self, command, shell=False):
         cmd = self.process_command(command)
         self.log.debug('Running: `{cmd}`'.format(cmd=cmd))
-        status = subprocess.run(cmd, shell=shell, timeout=self.timeout, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        stderr = subprocess.STDOUT if self.stderr_into_stdout else subprocess.DEVNULL
+        status = subprocess.run(cmd, shell=shell, timeout=self.timeout, stdout=subprocess.PIPE, stderr=stderr)
         return status
     
     async def async_run_command(self, command):
         cmd = self.process_command(command)
         self.log.debug('Running: `{cmd}`'.format(cmd=cmd))
-        status = await asyncio.subprocess.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+        stderr = asyncio.subprocess.STDOUT if self.stderr_into_stdout else asyncio.subprocess.DEVNULL
+        status = await asyncio.subprocess.create_subprocess_shell(cmd, stdout=asyncio.subprocess.PIPE, stderr=stderr)
         return status
     
-    def get_command_text(self, command, shell=False):
+    def get_command_text(self, command, shell=False, check=True):
         status = self.run_command(command, shell)
+        if check:
+            status.check_returncode()
         text = status.stdout.decode('utf-8')
         self.log.debug('cmd output: `{text}`'.format(text=text))
         return text
     
-    async def async_get_command_text(self, command):
+    async def async_get_command_text(self, command, check=True):
         status = await self.async_run_command(command)
         # I think we want to use communicate first, so we get the text, then call wait to set returncode
         # TODO does communicate() set the returncode?
         stdout, stderr = await asyncio.wait_for(status.communicate(), self.timeout)  # You wait for the timeout
-        await status.wait()
+        await status.wait()  # TODO use wait_for here too
+        if check:
+            if status.returncode != 0:
+                raise Exception(f"Error running command {command};\nstdout: {stdout}\nstderr: {stderr}")
         text = stdout.decode('utf-8')
         self.log.debug('cmd output: `{text}`'.format(text=text))
         return text
@@ -300,4 +308,5 @@ class Singularity(System):
         """
         super().__init__(*args, **kwargs)
         self.image = image
-        self.pre_command = '{singularity} exec {image} '.format(singularity=singularity)
+        self.pre_command = '{singularity} exec {image} '.format(singularity=singularity, image=image)
+        self.stderr_into_stdout = False
