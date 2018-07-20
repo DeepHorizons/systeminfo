@@ -61,7 +61,7 @@ To run, install the dependencies and call `app.py` from within the `web` folder.
 ```bash
 cd web
 pipenv install
-python3 app.py
+pipenv run python3 app.py
 ```
 
 ### Quick API overview
@@ -82,3 +82,12 @@ You must perpend a `?` to the start and separate the keys with a `&`. Order does
 
 ## Development
 Check the issues, feel free to make a merge request
+
+
+### Docker image
+Use the Dockerfile to create an image that can deploy a web server.
+
+```
+docker build -t systeminfo .
+docker run -it -v /opt/singularity/images:/opt/singularity/images -e SINGULARITY_IMAGE_DIR=/opt/singularity/images/ --net host privileged systeminfo
+```
