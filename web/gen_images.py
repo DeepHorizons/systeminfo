@@ -15,7 +15,9 @@ async def generate_images(app):
     if 'SINGULARITY_IMAGE_DIR' in os.environ:
         data = singularity_images(os.environ['SINGULARITY_IMAGE_DIR'])
     else:
+        app.logger.warning("SINGULARITY_IMAGE_DIR envvar not set; Using local system info")
         data = local_test()
+    app.logger.info(data)
     app.logger.debug("getting data for {len} images".format(len=len(data)))
     
     # Async worked much better here, 10 images took about 120 seconds using sync, 50 seconds using async
