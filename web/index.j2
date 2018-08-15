@@ -76,10 +76,23 @@
             return response;
         }
         
+	function get_search_string() {
+	    return document.getElementById('searchbox').value;
+	}
         function search(query) {
             fetch('?query=' + query).then(response => {return response.json()}
             ).then(json => {
 		// JSON data: `{"results": {<image name str> : {<package name str>: {"from": <'apt' or 'pip' str>, "name": <package name str>, "version": <package version str>}}}}`
+		// First we see if the query is still valid. Sometimes we get responses for old requests
+		let query = json['query'];
+		let current_query = get_search_string();
+		if(query != current_query) {
+		    // This response is old, stop here
+		    console.log("Got old query: " + query);
+		    console.log("Current query: " + current_query);
+		    return;
+		}
+
 		// Create the list element we use to display
 		// * image_name:
 		//     * package_name: version
