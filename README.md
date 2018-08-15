@@ -89,5 +89,5 @@ Use the Dockerfile to create an image that can deploy a web server.
 
 ```
 docker build -t systeminfo .
-docker run -it -v /opt/singularity/images:/opt/singularity/images -e SINGULARITY_IMAGE_DIR=/opt/singularity/images/ --net host privileged systeminfo
+docker run -it -v /opt/singularity/images:/opt/singularity/images -e SINGULARITY_IMAGE_DIR=/opt/singularity/images/ --net host --privileged systeminfo
 ```
