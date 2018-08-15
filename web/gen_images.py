@@ -32,7 +32,7 @@ def local_test(num=1):
 
 def singularity_images(path):
     # Find all images, symlink and all
-    images = [os.path.join(path, file) for path, folers, files in os.walk(path) for file in files]
+    images = [os.path.join(path, file) for path, folers, files in os.walk(path) for file in files if file.endswith('img')]
     images.sort(key=lambda key: len(key))
     # TODO Get hashes of each
     # TODO Compare against previous under app['singularity_images']
