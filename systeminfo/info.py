@@ -98,6 +98,7 @@ class System(Information):
         # `acr/bionic 1.2-1 all`
         # `adacontrol/bionic 1.19r10-2 amd64`
         # `g++/bionic,now 4:7.3.0-3ubuntu2 amd64 [installed,automatic]`
+        # `libcudnn7/unknown 7.2.1.38-1+cuda9.2 amd64 [upgradable from: 7.2.1.38-1+cuda9.0]`
         # I don't think there can be spaced in the version
         for line in text.split('\n'):
             if 'Listing...' in line:
@@ -118,12 +119,18 @@ class System(Information):
                     container['arch'] = vars[2]
                 else:
                     container['arch'] = vars[2]
-                    container['state'] = vars[3]
+                    # The state may be multiple words, but it will be the rest
+                    container['state'] = ' '.join(vars[3:])
+
+                    # If we have an installed version, and there is an upgrade available, it will be in the state
+                    if 'upgradable' in container['state']:
+                        _version = re.match(r'\[upgradable from: (.*)\]', container['state']).groups()[0]
+                        container['version'] = _version
 
                 self.log.debug("Apt app: {container}".format(container=container))
                 yield container
             except Exception as e:
-                self.log.warning("Problem with line: {line}".format(line=line))
+                self.log.warning("Problem with line: {line}; {e}".format(line=line, e=e))
 
     def apt_list(self, apps=None):
         """
@@ -140,17 +147,20 @@ class System(Information):
 
         return self._apt_list_helper(text)
 
+    def _check_apt_installed(self, app):
+        return True if ('state' in app and any([check in app['state'] for check in ['installed', 'upgradable']])) else False
+
     def apt_installed(self, apps=''):
         """
         Returns a filtered generator of apt applications if the state has 'installed' in it
         """
-        return (app for app in self.apt_list(apps) if 'state' in app and 'installed' in app['state'])
+        return (app for app in self.apt_list(apps) if self._check_apt_installed(app))
     
     async def async_apt_installed(self, apps=''):
         """
         Returns a filtered generator of apt applications if the state has 'installed' in it
         """
-        return (app for app in await self.async_apt_list(apps) if 'state' in app and 'installed' in app['state'])
+        return (app for app in await self.async_apt_list(apps) if self._check_apt_installed(app))
     
     def _apt_manually_installed_helper(self, text):
         # Extract out the commands issued
