@@ -11,6 +11,7 @@ async def on_prepare(app):
     app.logger.info("Startup: Creating image...")
     data = await generate_images(app)
     app['images'] = data
+    app.logger.info(f"Got: `{[image for image in data]}")
     app.logger.info("Startup: Finished creating images")
 
 def create_app(argv=''):
