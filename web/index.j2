@@ -121,10 +121,11 @@
                     // Every element in a <ul> list should be an <li>
                     let image_li_wrapper = document.createElement('li');
 	            let collapsable_link = document.createElement('a');
-	            collapsable_link.href = '#' + image_name;
+		    let _id = image_name.replace(/\W/g, '');
+	            collapsable_link.href = '#' + _id;
 	            collapsable_link.setAttribute('data-toggle', 'collapse');
 		    collapsable_link.innerHTML = image_name + ': ';
-	            image_ul.id = image_name;
+	            image_ul.id = _id;
 		    image_ul.classList.add('collapse');
 		    image_li_wrapper.classList.add('list-group-item');
 		    image_li_wrapper.appendChild(collapsable_link);
