@@ -111,11 +111,14 @@ class Search(web.View):
             for package_name, package_version in terms:
                 result = await info.async_search(package_name, version=package_version)
                 if not result:
+                    # If we did not find a a package, delete it from the results and then go to the next image
+                    app.logger.warning(f"Did not find `{pacakge_name}` = `{pacakge_version}`, deleting `{image_name}` from results")
                     try:
                         del term_results[image_name]
                     except:
                         pass
                     break
+                # Try to append, if there is a key error then create the first entry
                 try:
                     term_results[image_name].append(result)
                 except KeyError:
