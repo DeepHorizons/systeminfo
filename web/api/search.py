@@ -104,7 +104,10 @@ class Search(web.View):
         #print(terms)
         
         # Perform the search
-        images = request.config_dict['images']  # config_dict searches through the partent modules until it hits the first match; its how we get stuff on the root app
+        if 'images' in request.config_dict:
+            images = request.config_dict['images']  # config_dict searches through the partent modules until it hits the first match; its how we get stuff on the root app
+        else:
+            images = {}
         term_results = {}
         
         for image_name, info in images.items():
