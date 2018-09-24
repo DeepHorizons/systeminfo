@@ -22,7 +22,7 @@ async def generate_images(app):
     
     # Async worked much better here, 10 images took about 120 seconds using sync, 50 seconds using async
     start = time.time()
-    await asyncio.gather(*[info.async_get_dict() for info in data.values()])
+    #await asyncio.gather(*[info.async_get_dict() for info in data.values()])
     end = time.time()
     app.logger.debug("Took {seconds} seconds".format(seconds=end-start))
     return data

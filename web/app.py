@@ -17,9 +17,12 @@ async def update_images_periodically(app, timedelta=datetime.timedelta(minutes=5
             next = start + timedelta
             app.logger.info("Starting image check at `{start}`".format(start=start))
             data = await generate_images(app)
+            app.logger.info("Pre-searching images to prime them")
+            for image_name, info in data.items():
+                await info.async_search('vim')
             app['images'] = data
-
             end = datetime.datetime.now()
+
             duration = (end - start).total_seconds()
             diff = next - end
             next_check = diff.total_seconds()
